@@ -238,6 +238,11 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     {
         return server.addRequestHandler(requestMatcher, requestHandler);
     }
+    
+    public void clearListenerRegistry() throws IOException
+    {
+        server.clearListenerRegistry();
+    }
 
     public Boolean resolveParseRequest(Boolean listenerParseRequest)
     {

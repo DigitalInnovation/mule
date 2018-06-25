@@ -6,31 +6,11 @@
  */
 package org.mule.module.http.functional.listener;
 
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-
-import org.mule.construct.Flow;
-import org.mule.module.http.api.listener.HttpListener;
-import org.mule.module.http.api.listener.HttpListenerConfig;
-import org.mule.module.http.internal.domain.InputStreamHttpEntity;
-import org.mule.module.http.internal.domain.request.HttpRequestContext;
-import org.mule.module.http.internal.listener.HttpListenerRegistry;
-import org.mule.module.http.internal.listener.HttpListenerRegistryTestCase;
-import org.mule.module.http.internal.listener.RequestHandlerManager;
-import org.mule.module.http.internal.listener.ServiceTemporarilyUnavailableListenerRequestHandler;
-import org.mule.module.http.internal.listener.async.RequestHandler;
-import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMatcher;
-import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
-import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -41,6 +21,13 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.construct.Flow;
+import org.mule.module.http.api.listener.HttpListener;
+import org.mule.module.http.api.listener.HttpListenerConfig;
+import org.mule.module.http.internal.listener.DefaultHttpListener;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.util.IOUtils;
 
 public class HttpListenerLifecycleTestCase extends FunctionalTestCase
 {
@@ -103,6 +90,17 @@ public class HttpListenerLifecycleTestCase extends FunctionalTestCase
         final Response response = Request.Get(getLifecycleConfigUrl("/path/somepath")).execute();
         final HttpResponse httoResponse = response.returnResponse();
         assertThat(httoResponse.getStatusLine().getStatusCode(), is(404));
+    }
+    
+    @Test
+    public void disposeListenerClearsRegistryMaps() throws Exception
+    {
+        HttpListener httpListener = (HttpListener) ((Flow) getFlowConstruct("catchAllWithinTestPathFlow")).getMessageSource();
+        httpListener.dispose();
+        ((DefaultHttpListener) httpListener).setPath("/path/subpath");
+        // In case the paths were not cleared on disposing an exception indicating that
+        // the path already exists will be thrown.
+        httpListener.initialise();
     }
 
     @Test

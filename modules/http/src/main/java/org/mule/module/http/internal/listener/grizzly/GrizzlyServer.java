@@ -79,4 +79,10 @@ public class GrizzlyServer implements Server
     {
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
     }
+
+    @Override
+    public void clearListenerRegistry()
+    {
+        this.listenerRegistry.clearListenerRegistry(this);
+    }
 }

@@ -322,6 +322,13 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             }
             return null;
         }
+
+        public void clearRegistryMaps()
+        {
+            paths = new HashSet<>();
+            catchAllPathMap = new PathMap();
+            rootPathMap = new PathMap();
+        }
     }
 
     private boolean isUriParameter(String pathPart)
@@ -525,5 +532,12 @@ public class HttpListenerRegistry implements RequestHandlerProvider
             this.running = running;
         }
 
+    }
+
+    public void clearListenerRegistry(Server server)
+    {
+        ServerAddressRequestHandlerRegistry serverAddressRequestHandlerRegistry = this.requestHandlerPerServerAddress.get(server);
+        serverAddressRequestHandlerRegistry.clearRegistryMaps();
+        
     }
 }

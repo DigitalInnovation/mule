@@ -41,6 +41,7 @@ import org.mule.module.http.internal.listener.matcher.AcceptsAllMethodsRequestMa
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.listener.matcher.MethodRequestMatcher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -296,6 +297,14 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     @Override
     public void dispose()
     {
+        try
+        {
+            this.config.clearListenerRegistry();
+        }
+        catch (IOException e)
+        {
+            logger.error("Error while clearing listener registry.");
+        }
         requestHandlerManager.dispose();
     }
 

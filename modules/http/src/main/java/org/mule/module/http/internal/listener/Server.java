@@ -45,4 +45,6 @@ public interface Server
 
 
     RequestHandlerManager addRequestHandler(final ListenerRequestMatcher listenerRequestMatcher, final RequestHandler requestHandler);
+
+    void clearListenerRegistry();
 }
